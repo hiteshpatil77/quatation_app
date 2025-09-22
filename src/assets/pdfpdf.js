@@ -1,14 +1,13 @@
-const converter = require('number-to-words');
-import {Images} from '../assets/Images';
-import {image0, image1, image2, image3} from './base64Img';
-export const pdfpdf = formData => {
+const converter = require("number-to-words");
+import { image0, image1, image2, image3 } from "./base64Img";
+export const pdfpdf = (formData) => {
   const {
     ConsumerNumber,
     CustomerName,
     CustomerAddress,
     CustomerMobile,
     CustomerEmail,
-    Customertype,
+    customerType,
     NoOfPanel,
     panelWattPeak,
     sellingRate,
@@ -22,13 +21,17 @@ export const pdfpdf = formData => {
     inverterCapacity,
     inverterCharges,
     noOfMeter,
+    // Optional: include a URL to the generated PDF if provided
+    pdfUrl,
   } = formData;
+  console.log("formData in pdfpdf.js", formData);
 
   const CustomerReqKW = ((NoOfPanel * panelWattPeak) / 1000).toFixed(2);
   let subsidyAmmount = 0;
   const d = new Date();
   const todayDate = `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
-  if (Customertype === 'House-Hold') {
+  console.log("customerType=-==", customerType);
+  if (customerType === "household") {
     if (CustomerReqKW <= 2) {
       subsidyAmmount = (CustomerReqKW * 30000).toFixed(2);
     } else if (CustomerReqKW > 2) {
@@ -38,15 +41,15 @@ export const pdfpdf = formData => {
         subsidyAmmount = (2 * 30000 + (CustomerReqKW - 2) * 18000).toFixed(2);
       }
     }
-  } else if (Customertype === 'Organization') {
+  } else if (customerType === "org") {
     subsidyAmmount = (CustomerReqKW * 18000).toFixed(2);
-  } else if (Customertype === 'Commercial') {
+  } else if (customerType === "commercial") {
     subsidyAmmount = (CustomerReqKW * 0).toFixed(2);
   }
   const taxableAmmount = (sellingRate * CustomerReqKW).toFixed(2);
-  const noOfPhaseText = noOfPhase == 1 ? 'single' : 'three';
+  const noOfPhaseText = noOfPhase == 1 ? "single" : "three";
   const totalWithTax = Number(
-    Number(taxableAmmount) + (taxableAmmount * gstPercent) / 100,
+    Number(taxableAmmount) + (taxableAmmount * gstPercent) / 100
   ).toFixed(2);
   const totalMeterCharge = (noOfMeter * meterCharges).toFixed(2);
   const totalStructureCharge = (structureCharges * CustomerReqKW).toFixed(2);
@@ -213,6 +216,11 @@ export const pdfpdf = formData => {
                         <p>MOB. +91${CustomerMobile}.
                         </p>
                         <p>Email Id: ${CustomerEmail}</p>
+                        ${
+                          pdfUrl
+                            ? `<p>PDF URL: <a href="${pdfUrl}">${pdfUrl}</a></p>`
+                            : ``
+                        }
                         <p style="font-weight: bold">Subject: Estimate for ${CustomerReqKW} KW Solar Rooftop Project</p>
                     </td>
                     <td colspan="2">
@@ -297,10 +305,10 @@ export const pdfpdf = formData => {
                                       Number(sellingRate * gstPercent) / 100
                                     ).toFixed(2)}</p></td>
                                     <td><p>${(gstPercent / 2).toFixed(
-                                      2,
+                                      2
                                     )} %</p></td>
                                     <td><p>${(gstPercent / 2).toFixed(
-                                      2,
+                                      2
                                     )} %</p></td>
                                 </tr>
                                 <tr>
@@ -377,7 +385,7 @@ export const pdfpdf = formData => {
                             </tr>
                             <tr>
                                 <td rowspan="3" colspan="5" class="left-text"><p> Total in Words : ${converter.toWords(
-                                  totalWithSubsidy,
+                                  totalWithSubsidy
                                 )}</p></td>
                                 <td colspan="2"><p> Subsidy Get Back</p></td>
                                 <td><p> ₹ ${subsidyAmmount}</p></td>

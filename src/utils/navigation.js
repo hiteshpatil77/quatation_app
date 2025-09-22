@@ -1,19 +1,24 @@
-import React from 'react';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import SlpashScreen from '../screens/splashScreen';
-import AuthenticationOptionScreen from '../screens/authOptions';
-import SignInScreen from '../screens/signInScreen';
-import SignUpScreen from '../screens/signUpScreen';
-import HomeScreen from '../screens/HomeScreen';
-import RequestScreen from '../screens/RequestScreen';
-import {Image, View} from 'react-native';
-import Images from '../assets/Images';
-import CustomerScreen from '../screens/CustomerScreen';
-import Quotation from '../screens/QuotationForm';
-import BillForm from '../screens/BillForm';
-import Pddf from '../screens/QuotationForm';
-import FileList from '../screens/RequestScreen';
+import React from "react";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import SlpashScreen from "../screens/splashScreen";
+import AuthenticationOptionScreen from "../screens/authOptions";
+import SignInScreen from "../screens/signInScreen";
+import SignUpScreen from "../screens/signUpScreen";
+import HomeScreen from "../screens/HomeScreen";
+import { Image, View } from "react-native";
+import CustomerScreen from "../screens/CustomerScreen";
+import BillForm from "../screens/BillForm";
+import Pddf from "../screens/QuotationForm";
+import FileList from "../screens/RequestScreen";
+import ViewQuotation from "../screens/ViewQuotation";
+import Icon from "react-native-vector-icons/AntDesign";
+import { FS, HP } from "./Dimention";
+import Colors from "./Colors";
+import CreatLead from "../screens/CreatLead";
+import ViewLead from "../screens/ViewLead";
+import Support from "../screens/Support";
+import ComplaintScreen from "../screens/CompnaintScreen";
 const stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -23,31 +28,57 @@ export function InitialRoutes() {
       <stack.Navigator
         screenOptions={{
           headerShown: false,
-        }}>
+        }}
+      >
         <stack.Screen
           name="Splash"
           component={SlpashScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <stack.Screen
           name="AuthOptions"
           component={AuthenticationOptionScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <stack.Screen
           name="SignIn"
           component={SignInScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <stack.Screen
           name="SignUp"
           component={SignUpScreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <stack.Screen
           name="MainStack"
           component={BottomNavigations}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
+        />
+        <stack.Screen
+          name="ViewQuotation"
+          component={ViewQuotation}
+          options={{ headerShown: false }}
+        />
+        <stack.Screen
+          name="CreatLead"
+          component={CreatLead}
+          options={{ headerShown: false }}
+        />
+        <stack.Screen
+          name="ViewLead"
+          component={ViewLead}
+          options={{ headerShown: false }}
+        />
+        <stack.Screen
+          name="Quotation"
+          component={Pddf}
+          options={{ headerShown: false }}
+        />
+        <stack.Screen
+          name="Support"
+          component={Support}
+          options={{ headerShown: false }}
         />
       </stack.Navigator>
     </>
@@ -57,79 +88,64 @@ export function InitialRoutes() {
 export const BottomNavigations = () => {
   return (
     <Tab.Navigator
-      screenOptions={({route}) => ({
+      screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarIcon: ({focused, color, size}) => {
+        tabBarIcon: ({ focused }) => {
           let iconName;
-
-          if (route.name === 'Home') {
-            iconName = Images.tabHomeIcon;
-          } else if (route.name === 'Requests') {
-            iconName = Images.tabRequestIcon;
-          } else if (route.name === 'Customers') {
-            iconName = Images.tabProfileIcon;
+          if (route.name === "Home") {
+            iconName = "home";
+          } else if (route.name === "ViewQuotation") {
+            iconName = "filetext1";
+          } else if (route.name === "Lead") {
+            iconName = "user";
+          } else if (route.name === "Complaint") {
+            iconName = "exclamationcircle";
           }
 
-          // You can return any component that you like here!
           return (
-            <Image
-              source={iconName}
+            <View
               style={{
-                width: 25,
-                height: 25,
-                tintColor: focused ? 'brown' : 'gray',
+                backgroundColor: focused ? Colors.primary : "#f2f2f2",
+                borderRadius: 20,
+                padding: 8,
               }}
-            />
+            >
+              <Icon
+                name={iconName}
+                size={20}
+                color={focused ? "#fff" : "gray"}
+              />
+            </View>
           );
         },
-        tabBarActiveTintColor: 'brown',
-        tabBarInactiveTintColor: 'gray',
-        tabBarStyle: {backgroundColor: '#fff'},
-        // You can return any component that you like here!
-        tabBarBackground: () => {
-          return (
-            <></>
-            // <View style={{flex:1, backgroundColor:"black"}}></View>
-          );
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: "gray",
+        tabBarStyle: {
+          backgroundColor: "#fff",
+          height: HP(8),
+          borderRadius: HP(2),
+          position: "absolute",
+          margin: HP(1),
+          elevation: 5,
+          opacity: 100,
         },
-      })}>
-      <Tab.Screen name="Home" component={HomeScreenStack} />
-      <Tab.Screen name="Requests" component={FileList} />
-      <Tab.Screen name="Customers" component={CustomerScreenStack} />
+        tabBarItemStyle: {
+          marginVertical: 5,
+          borderRadius: 15,
+        },
+        tabBarLabelStyle: {
+          fontSize: FS(1.2),
+          marginTop: 2,
+          borderRadius: HP(1),
+          paddingHorizontal: 6,
+          paddingVertical: 2,
+        },
+      })}
+    >
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="ViewQuotation" component={ViewQuotation} />
+      <Tab.Screen name="Lead" component={ViewLead} />
+      <Tab.Screen name="Complaint" component={ComplaintScreen} />
     </Tab.Navigator>
-  );
-};
-
-export const CustomerScreenStack = () => {
-  return (
-    <stack.Navigator>
-      <stack.Screen
-        name="CustomerScreen"
-        component={CustomerScreen}
-        options={{headerShown: false}}
-      />
-    </stack.Navigator>
-  );
-};
-
-export const HomeScreenStack = () => {
-  return (
-    <stack.Navigator screenOptions={{headerShown: false}}>
-      <stack.Screen
-        name="HomeScreen"
-        component={HomeScreen}
-        options={{headerShown: false}}
-      />
-      <stack.Screen
-        name="Quotation"
-        component={Pddf}
-        options={{headerShown: false}}
-      />
-      <stack.Screen
-        name="Bill"
-        component={BillForm}
-        options={{headerShown: false}}
-      />
-    </stack.Navigator>
   );
 };

@@ -1,77 +1,152 @@
-import {StyleSheet, Text, TextInput, View} from 'react-native';
-import CsButton from '../components/CustomeButton';
-import {Formik} from 'formik';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  TouchableOpacity,
+  Image,
+  ImageBackground,
+  Alert,
+  KeyboardAvoidingView,
+} from "react-native";
+import React, { useState } from "react";
+import Icon from "react-native-vector-icons/Octicons";
+import { WP } from "../utils/Dimention";
+import { apiCalls } from "../api/api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Colors from "../utils/Colors";
 
-export default function SignInScreen({navigation}) {
+export default function SignInScreen({ navigation }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Please enter email and password");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await apiCalls.login(email, password);
+
+      console.log("Login Response:", response);
+
+      if (response?.token) {
+        await AsyncStorage.setItem("accessToken", response.token);
+        await AsyncStorage.setItem("UserName", response.user.name);
+      }
+
+      // Alert.alert("Success", "Logged in successfully");
+      navigation.navigate("MainStack", { name: response });
+    } catch (error) {
+      Alert.alert("Login Failed", error.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <View style={styles.loginFormContainer}>
-      <Formik
-        initialValues={{email: '', password: ''}}
-        onSubmit={value => {
-          console.log(value);
-        }}>
-        {({handleChange, handleBlur, handleSubmit, values}) => (
-          <>
-            <Text style={{color: '#000'}}>Email</Text>
+    <KeyboardAvoidingView style={{ flex: 1 }}>
+      <ImageBackground
+        style={{ flex: 1 }}
+        source={require("../assets/backGround.png")}
+      >
+        {/* Title */}
+        <View
+          style={{ flex: 0.3, justifyContent: "center", alignItems: "center" }}
+        >
+          <Image
+            source={require("../assets/solarLogo.png")}
+            style={{ resizeMode: "center" }}
+          />
+        </View>
+        <View
+          style={{ flex: 0.2, justifyContent: "center", alignItems: "center" }}
+        >
+          <Text
+            style={{ fontSize: 30, fontWeight: "bold", color: Colors.primary }}
+          >
+            Sign In
+          </Text>
+        </View>
 
-            <TextInput
-              name="email"
-              placeholder="Email@mail.com"
-              placeholderTextColor={'gray'}
-              value={values.email}
-              onChange={handleChange('email')}
-              onBlur={handleBlur('email')}
-              style={styles.inputText}
-            />
-            <Text style={{color: '#000'}}>Password</Text>
+        {/* Email / Phone */}
+        <View style={styles.inputBox}>
+          <TextInput
+            placeholder="Email or Phone"
+            style={{ flex: 1, color: "#333" }}
+            value={email}
+            onChangeText={setEmail}
+            placeholderTextColor={"#333"}
+          />
+        </View>
 
-            <TextInput
-              name="password"
-              placeholder="Password"
-              placeholderTextColor={'gray'}
-              value={values.password}
-              onChange={handleChange('password')}
-              onBlur={handleBlur('password')}
-              style={styles.inputText}
-              secureTextEntry
+        {/* Password */}
+        <View style={styles.inputBoxRow}>
+          <TextInput
+            style={{ width: WP(75), color: "#333" }}
+            placeholder="Password"
+            secureTextEntry={!passwordVisible}
+            value={password}
+            onChangeText={setPassword} // 👈 toggle here
+            placeholderTextColor={"#333"}
+          />
+          <TouchableOpacity
+            style={{ padding: 10 }}
+            onPress={() => setPasswordVisible(!passwordVisible)}
+          >
+            <Icon
+              name={passwordVisible ? "eye" : "eye-closed"}
+              size={25}
+              color="#333"
             />
-            <CsButton
-              name={'Login'}
-              color="#d268cc"
-              onClick={() => {
-                console.log('login is pressed');
-              }}
-            />
-          </>
-        )}
-      </Formik>
-      <View style={{alignItems: 'center', marginTop: 25}}>
-        <Text style={{color: 'blue'}}>Already have an Account?</Text>
-        <CsButton
-          name={'SignUp'}
-          color="#d268cc"
-          width={100}
-          onClick={() => navigation.replace('SignUp')}
-        />
-      </View>
-    </View>
+          </TouchableOpacity>
+        </View>
+        <View style={{ alignItems: "center", marginTop: 20 }}>
+          <TouchableOpacity
+            style={{
+              backgroundColor: Colors.primary,
+              padding: 10,
+              borderRadius: 10,
+              width: "90%",
+              alignItems: "center",
+              opacity: loading ? 0.6 : 1,
+            }}
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            <Text style={{ color: "#fff", fontSize: 18 }}>
+              {loading ? "Signing In..." : "Sign In"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ImageBackground>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  loginFormContainer: {
-    flex: 1,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#E7E8D1',
-  },
-  inputText: {
-    height: 40,
-    borderWidth: StyleSheet.hairlineWidth,
-    width: '80%',
+  inputBox: {
+    margin: 20,
     borderRadius: 5,
-    borderColor: 'black',
-    marginVertical: 10,
+    paddingLeft: 10,
+    backgroundColor: "#F5F9FE",
+    paddingVertical: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    elevation: 5,
+  },
+  inputBoxRow: {
+    margin: 20,
+    borderRadius: 5,
+    paddingLeft: 10,
+    backgroundColor: "#F5F9FE",
+    paddingVertical: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    elevation: 5,
   },
 });

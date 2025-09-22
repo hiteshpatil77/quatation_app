@@ -1,26 +1,11 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React from "react";
+import type { PropsWithChildren } from "react";
+import { StyleSheet, Text, useColorScheme, View } from "react-native";
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
-
-import {Colors} from 'react-native/Libraries/NewAppScreen';
-import SlpashScreen from './src/screens/splashScreen';
-import {NavigationContainer} from '@react-navigation/native';
-import {InitialRoutes} from './src/utils/navigation';
+import { NavigationContainer } from "@react-navigation/native";
+import { InitialRoutes } from "./src/utils/navigation";
+import store from "./src/screens/redux/Store";
+import { Provider } from "react-redux";
 
 function App(): React.JSX.Element {
   // const isDarkMode = useColorScheme() === 'dark';
@@ -29,9 +14,11 @@ function App(): React.JSX.Element {
   //   backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   // };
   return (
-    <NavigationContainer>
-      <InitialRoutes />
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        <InitialRoutes/>
+      </NavigationContainer>
+    </Provider>
   );
 }
 
